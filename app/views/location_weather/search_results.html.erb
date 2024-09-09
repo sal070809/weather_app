@@ -1,0 +1,11 @@
+<h1>Weather Results</h1>
+
+<% if @search_presenter %>
+  <h2>Search Results</h2>
+  <p><strong>Location:</strong> <%= @search_presenter.location %></p>
+  <p><strong>Temperature:</strong> <%= @search_presenter.temperature %> °F</p>
+  <p><strong>Description:</strong> <%= @search_presenter.description %></p>
+  <p><strong>Humidity:</strong> <%= @search_presenter.humidity %> %</p>
+<% else %>
+  <p>No weather data available.</p>
+<% end %>

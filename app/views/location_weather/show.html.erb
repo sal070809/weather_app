@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weather App</title>
+    <script>
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(sendPosition);
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+
+      function sendPosition(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('<%= weather_path %>', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRF-Token': token
+          },
+          body: new URLSearchParams({
+            'latitude': latitude,
+            'longitude': longitude
+          })
+        })
+        .then(response => response.text())
+        .then(html => {
+          document.body.innerHTML = html;
+        })
+        .catch(error => console.error('Error:', error));
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        getLocation();
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Local Weather Information</h1>
+    <% if @presenter&.location.present? %>
+        <h2>Weather in <%= @presenter&.location %></h2>
+        <p>Temperature: <%= @presenter&.temperature %>°F</p>
+        <p>Description: <%= @presenter&.description %></p>
+        <p>Humidity: <%= @presenter&.humidity %>%</p>
+      <% else %>
+        <p>Loading</p>
+      <% end %>
+
+
+  <h1>Find Weather Information</h1>
+    <%= form_with url: weather_results_path, method: :get, local: true do %>
+      <%= label_tag :city, "City" %>
+      <%= text_field_tag :city %>
+
+      <%= label_tag :state, "State" %>
+      <%= text_field_tag :state %>
+
+      <%= submit_tag "Search" %>
+    <% end %>
+  </body>
+</html>
